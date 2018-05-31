@@ -54,6 +54,35 @@ public class MaterialUsage {
 		this.wastageQty = wastageQty;
 	}
 	
-	
+	@Override
+	public String toString() {
+		return "MaterialUsage [materialName=" + materialName + ", consumptionQty=" + consumptionQty
+				+ ", materialMeasurementUnit=" + materialMeasurementUnit + ", wastageQty=" + wastageQty + "]";
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((materialName == null) ? 0 : materialName.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		MaterialUsage other = (MaterialUsage) obj;
+		if (materialName == null) {
+			if (other.materialName != null)
+				return false;
+		} else if (!materialName.equals(other.materialName))
+			return false;
+		return true;
+	}
 
 }

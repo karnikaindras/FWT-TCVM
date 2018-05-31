@@ -10,8 +10,6 @@ public class Container {
 	
 	private int volumeFilled;
 	
-	
-
 	public Container() {
 	
 	}
@@ -54,6 +52,31 @@ public class Container {
 
 	public void setVolumeFilled(int volumeFilled) {
 		this.volumeFilled = volumeFilled;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((materialName == null) ? 0 : materialName.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Container other = (Container) obj;
+		if (materialName == null) {
+			if (other.materialName != null)
+				return false;
+		} else if (!materialName.equals(other.materialName))
+			return false;
+		return true;
 	}
 	
 	

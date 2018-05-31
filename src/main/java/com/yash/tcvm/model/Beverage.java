@@ -45,6 +45,36 @@ public class Beverage {
 		this.ingredients = ingredients;
 	}
 	
+	@Override
+	public String toString() {
+		return "Beverage [beverageName=" + beverageName + ", price=" + price + ", ingredients=" + ingredients + "]";
+	}
 	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((beverageName == null) ? 0 : beverageName.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Beverage other = (Beverage) obj;
+		if (beverageName == null) {
+			if (other.beverageName != null)
+				return false;
+		} else if (!beverageName.equals(other.beverageName))
+			return false;
+		return true;
+	}
+
+
 
 }

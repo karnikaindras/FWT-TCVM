@@ -14,13 +14,12 @@ public class Test {
 		List<Container> containerList = new LinkedList<Container>();
 		Container tea = new Container("tea", 2, false, 2);
 		Container coffee = new Container("coffee", 2, false, 2);
-		Container sugar = new Container("tea", 8, false, 8);
-		Container water = new Container("tea", 15, false, 15);
-		Container milk = new Container("tea", 10, false, 10);
+		Container sugar = new Container("sugar", 8, false, 8);
+		Container water = new Container("water", 15, false, 15);
+		Container milk = new Container("milk", 10, false, 10);
 		
 		containerList.add(tea);
 		containerList.add(coffee);
-		containerList.add(sugar);
 		containerList.add(sugar);
 		containerList.add(water);
 		containerList.add(milk);
@@ -29,14 +28,14 @@ public class Test {
 		String containerListToJson = gson.toJson(containerList);
 		
 		
-//		try {
-//			FileWriter writer = new FileWriter("Containers.json");
-//			writer.write(containerListToJson);
-//			writer.close();
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		};
+		try {
+			FileWriter writer = new FileWriter("Containers.json");
+			writer.write(containerListToJson);
+			writer.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		};
 		
 
 	}
