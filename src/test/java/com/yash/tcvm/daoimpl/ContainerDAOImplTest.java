@@ -60,5 +60,14 @@ public class ContainerDAOImplTest {
 		assertEquals(materialName, container.getMaterialName());
 		}
 	
-
+	@Test(expected = NullValueNotAllowedException.class)
+	public void updateContainer_whenContainerObjectPassedIsNull_shouldThrowException() {
+		containerDAO.updateContainer(null);
+	}
+	
+	@Test
+	public void updateContainer_whenContainerObjectPassedIsNotNull_And_ContainerExist_shouldReturnTrue() {
+		Container teaContainer = new Container("tea", 10, false, 6);
+		assertTrue(containerDAO.updateContainer(teaContainer));
+	}
 }

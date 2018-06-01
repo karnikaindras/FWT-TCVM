@@ -12,4 +12,6 @@ public interface ContainerDAO {
 
 	List<Container> listContainers();
 
+	boolean updateContainer(Container updatedContainer);
+
 }

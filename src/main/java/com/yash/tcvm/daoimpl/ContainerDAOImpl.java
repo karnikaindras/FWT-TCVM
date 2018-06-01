@@ -86,6 +86,16 @@ public class ContainerDAOImpl implements ContainerDAO {
 		return containerList;
 	}
 
+	@Override
+	public boolean updateContainer(Container updatedContainer) {
+		if(updatedContainer == null) {
+			throw new NullValueNotAllowedException(ExceptionMessage.WHEN_CONTAINER_OBJECT_PASSED_IS_NULL);
+		}
+		int indexOfScreenToBeUpdated = containerList.indexOf(updatedContainer);
+		containerList.add(indexOfScreenToBeUpdated, updatedContainer);
+		return true;
+	}
+
 	
 	
 	
