@@ -1,5 +1,8 @@
 package com.yash.tcvm.service;
 
+import java.util.List;
+
+import com.yash.tcvm.model.Container;
 import com.yash.tcvm.model.Order;
 
 public interface OrderService {
@@ -9,5 +12,7 @@ public interface OrderService {
 	int generateBill(Order order);
 
 	boolean prepareOrder(Order order);
+
+	List<Container> getContainerStatus();
 
 }

@@ -5,10 +5,12 @@ package com.yash.tcvm.serviceimpl;
 import java.util.List;
 
 import com.yash.tcvm.dao.ContainerDAO;
+import com.yash.tcvm.daoimpl.ContainerDAOImpl;
 import com.yash.tcvm.exception.InvalidInputException;
 import com.yash.tcvm.exception.NotEnoughMaterialPresentException;
 import com.yash.tcvm.exception.NullValueNotAllowedException;
 import com.yash.tcvm.factory.BeverageFactory;
+import com.yash.tcvm.factoryimpl.BeverageFactoryImpl;
 import com.yash.tcvm.messages.ExceptionMessage;
 import com.yash.tcvm.model.Beverage;
 import com.yash.tcvm.model.Container;
@@ -23,11 +25,19 @@ public class OrderServiceImpl implements OrderService {
 	private ContainerDAO containerDAO;
 	private BeverageFactory beverageFactory;
 	private ContainerService containerService;
+	
+	public OrderServiceImpl() {
+		containerDAO = new ContainerDAOImpl();
+		beverageFactory = new BeverageFactoryImpl();
+		containerService = new ContainerServiceImpl(containerDAO);
+	}
 	public OrderServiceImpl(ContainerDAO containerDAO, BeverageFactory beverageFactory, ContainerService containerService ) {
 		this.containerDAO = containerDAO;
 		this.beverageFactory = beverageFactory;
 		this.containerService = containerService;
 	}
+
+	
 
 	@Override
 	public boolean takeOrder(Order order) {
@@ -41,6 +51,9 @@ public class OrderServiceImpl implements OrderService {
 			int quantity = order.getItemQty();
 			if(quantity == 0) {
 				throw new InvalidInputException(ExceptionMessage.WHEN_ORDER_QUANTITY_IS_ZERO);
+			}
+			if(quantity <0) {
+				throw new InvalidInputException(ExceptionMessage.WHEN_ORDER_QUANTITY_IS_LESS_THAN_ZERO);
 			}
 			List<MaterialUsage> materialUsedForMakingOneBeverage = orderedBeverage.getIngredients();
 			List<MaterialUsage> materialUsedForGivenBeverageQty = calculateMaterialRequiredForGivenQty(orderedBeverage, quantity,materialUsedForMakingOneBeverage );
@@ -98,6 +111,10 @@ public class OrderServiceImpl implements OrderService {
 		List<MaterialUsage> materialUsedForMakingOneBeverage = orderedBeverage.getIngredients();
 		List<MaterialUsage> materialUsedForGivenBeverageQty = calculateMaterialRequiredForGivenQty(orderedBeverage, quantity,materialUsedForMakingOneBeverage );
 		return containerService.prepareBeverage(materialUsedForGivenBeverageQty);
+	}
+	@Override
+	public List<Container> getContainerStatus() {
+		return containerDAO.listContainers();
 	}
 
 }

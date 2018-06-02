@@ -92,6 +92,7 @@ public class ContainerDAOImpl implements ContainerDAO {
 			throw new NullValueNotAllowedException(ExceptionMessage.WHEN_CONTAINER_OBJECT_PASSED_IS_NULL);
 		}
 		int indexOfScreenToBeUpdated = containerList.indexOf(updatedContainer);
+		containerList.remove(indexOfScreenToBeUpdated);
 		containerList.add(indexOfScreenToBeUpdated, updatedContainer);
 		return true;
 	}

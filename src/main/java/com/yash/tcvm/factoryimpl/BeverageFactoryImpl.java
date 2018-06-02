@@ -69,19 +69,23 @@ public class BeverageFactoryImpl implements BeverageFactory {
 
 	@Override
 	public Beverage createBeverage(String beverageName) {
-		Beverage beverageWithGivenName;
+		 
 		if(beverageName == null) {
 			throw new NullValueNotAllowedException(ExceptionMessage.WHEN_BEVERAGE_NAME_IS_NULL);
 		}
-		beverageWithGivenName = findBeverageWithGivenName(beverageName);
+		Beverage beverageWithGivenName = findBeverageWithGivenName(beverageName);
 		return beverageWithGivenName;
 	}
 
 	private Beverage findBeverageWithGivenName(String beverageName) {
 		Beverage beverageWithGivenName = null;
+		beverageList = getBeverageList();
 		for (Beverage beverage : beverageList) {
 			if(beverage.getBeverageName().equals( beverageName)) {
-				beverageWithGivenName =beverage;
+				beverageWithGivenName = new Beverage();
+				beverageWithGivenName.setBeverageName(beverage.getBeverageName());
+				beverageWithGivenName.setIngredients(beverage.getIngredients());
+				beverageWithGivenName.setPrice(beverage.getPrice());
 			}
 		}
 		if(beverageWithGivenName == null) {

@@ -6,12 +6,12 @@ import com.yash.tcvm.model.Container;
 
 public interface ContainerDAO {
 
-	int getContainerListSize();
+	public int getContainerListSize();
 
-	Container getContainerByName(String containerName);
+	public Container getContainerByName(String containerName);
 
-	List<Container> listContainers();
+	public List<Container> listContainers();
 
-	boolean updateContainer(Container updatedContainer);
+	public boolean updateContainer(Container updatedContainer);
 
 }

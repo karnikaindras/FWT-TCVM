@@ -33,6 +33,7 @@ public class OrderServiceImplTest {
 	Container waterContainer = null;
 	Container sugarContainer = null;
 	Container underFlowTeaContainer = null;
+	List<Container> containerList;
 	
 	private ContainerDAO containerDAO;
 	private ContainerService containerService;
@@ -59,6 +60,10 @@ public class OrderServiceImplTest {
 		underFlowTeaContainer = new Container("tea", 3, false, 3);
 		waterContainer = new Container("water", 250, false, 250);
 		sugarContainer = new Container("sugar", 40, false, 40);
+		
+		containerList = new ArrayList<Container>();
+		containerList.add(teaContainer);
+		containerList.add(waterContainer);
 	}
 
 	@Test(expected = NullValueNotAllowedException.class)
@@ -73,6 +78,12 @@ public class OrderServiceImplTest {
 		orderService.takeOrder(order);
 	}
 	
+	@Test(expected = InvalidInputException.class)
+	public void takeOrderMethod_WhenOrderObjectPassed_IsNotNull_But_ItemQuantityIsLessThanZero_shouldThrowException() {
+		Order order = new Order(1, OrderType.ORDER, "blacktea",0, -1); 
+		orderService.takeOrder(order);
+	}
+	
 	@Test
 	public void takeOrderMethod_WhenOrderTypeIsOrder_AndSufficientMaterialIsPresent_shouldReturnTrue() {
 		Order order = new Order(1, OrderType.ORDER, "blacktea",0,2); 
@@ -84,6 +95,7 @@ public class OrderServiceImplTest {
 		assertTrue(isOrderTaken);
 	}
 	
+
 	@Test(expected = NotEnoughMaterialPresentException.class)
 	public void takeOrderMethod_WhenOrderTypeIsOrder_AndSufficientMaterialIsNotPresent_shouldThrowException() {
 		Order order = new Order(1, OrderType.ORDER, "blacktea",0,2); 
@@ -114,6 +126,13 @@ public class OrderServiceImplTest {
 		Order order = null;
 		orderService.prepareOrder(order);
 		
+	}
+	
+	@Test
+	public void getContainerStatus_shouldReturn_NonEmptyListOfContainers() {
+		when(containerDAO.listContainers()).thenReturn(containerList);
+		List<Container> containerStatusList = orderService.getContainerStatus();
+		assertFalse(containerStatusList.isEmpty());
 	}
 	
 

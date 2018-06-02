@@ -28,6 +28,8 @@ public interface ExceptionMessage {
 	
 	String WHEN_LIST_OF_MATERIALS_REQUIRED_IS_EMPTY = "List of materials required cannot be empty";
 
+	String WHEN_ORDER_QUANTITY_IS_LESS_THAN_ZERO = "Order quantity cannot be negative";
+
 	
 
 	
