@@ -1,9 +1,12 @@
 package com.yash.tcvm.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.yash.tcvm.model.Container;
+import com.yash.tcvm.model.DrinkWiseReport;
 import com.yash.tcvm.model.Order;
+import com.yash.tcvm.model.TotalSalesReport;
 
 public interface OrderService {
 
@@ -14,5 +17,15 @@ public interface OrderService {
 	boolean prepareOrder(Order order);
 
 	List<Container> getContainerStatus();
+	
+	boolean refillContainer(String containerName, int refillQuantity);
+	
+	public boolean refillContainer(Order order);
+
+	TotalSalesReport generateTotalSaleReport();
+
+	List<DrinkWiseReport> generateDrinkWiseSaleReport();
+
+	int generateRefillCount();
 
 }

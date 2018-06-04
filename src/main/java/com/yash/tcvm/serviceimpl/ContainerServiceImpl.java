@@ -5,6 +5,7 @@ import java.util.List;
 import com.yash.tcvm.dao.ContainerDAO;
 import com.yash.tcvm.daoimpl.ContainerDAOImpl;
 import com.yash.tcvm.exception.EmptyCollectionException;
+import com.yash.tcvm.exception.EntityNotFoundException;
 import com.yash.tcvm.exception.NullValueNotAllowedException;
 import com.yash.tcvm.messages.ExceptionMessage;
 import com.yash.tcvm.model.Container;
@@ -56,7 +57,11 @@ public class ContainerServiceImpl implements ContainerService {
 		if( materialName == null) {
 			throw new NullValueNotAllowedException(ExceptionMessage.WHEN_MATERIAL_NAME_PASSED_IS_NULL);
 		}
-		return containerDAO.getContainerByName(materialName);
+		Container containerForGivenMaterial = containerDAO.getContainerByName(materialName);
+		if( containerForGivenMaterial == null) {
+			throw new EntityNotFoundException(ExceptionMessage.WHEN_NO_CONTAINER_EXIST_WTIH_GIVEN_NAME);
+		}
+		return containerForGivenMaterial;
 	}
 
 }

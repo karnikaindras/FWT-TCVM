@@ -14,6 +14,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 
 import com.yash.tcvm.dao.ContainerDAO;
+import com.yash.tcvm.exception.ContainerOverflowException;
 import com.yash.tcvm.exception.InvalidInputException;
 import com.yash.tcvm.exception.NotEnoughMaterialPresentException;
 import com.yash.tcvm.exception.NullValueNotAllowedException;
@@ -134,6 +135,61 @@ public class OrderServiceImplTest {
 		List<Container> containerStatusList = orderService.getContainerStatus();
 		assertFalse(containerStatusList.isEmpty());
 	}
+	
+	@Test(expected = NullValueNotAllowedException.class)
+	public void refillContainer_when_containerNamePassedIsNull_shouldThrowException() {
+		String containerName = null;
+		int refillQuantity = 200;
+		orderService.refillContainer(containerName, refillQuantity);
+	}
+	
+	@Test(expected = InvalidInputException.class)
+	public void refillContainer_when_refillQuantityPassedIsNegative_shouldThrowException() {
+		String containerName = "tea";
+		int refillQuantity = -200;
+		orderService.refillContainer(containerName, refillQuantity);
+	}
+	
+	@Test(expected = ContainerOverflowException.class)
+	public void refillContainer_when_ContainerIsCompletelyFilledAlready_shouldThrowException() {
+		String containerName = "tea";
+		int refillQuantity = 20;
+		Container teaContainer = new Container("tea", 100, false, 100);
+		when(containerDAO.getContainerByName("tea")).thenReturn(teaContainer);
+//		when(containerDAO.updateContainer(any(Container.class))).thenReturn(true);
+		orderService.refillContainer(containerName, refillQuantity);
+	}
+	
+	@Test(expected = ContainerOverflowException.class)
+	public void refillContainer_when_RefillQuantityIsGreaterThanMaximumRefillQuantity_shouldThrowException() {
+		String containerName = "tea";
+		int refillQuantity = 30;
+		Container teaContainer = new Container("tea", 100, false, 80);
+		when(containerDAO.getContainerByName("tea")).thenReturn(teaContainer);
+//		when(containerDAO.updateContainer(any(Container.class))).thenReturn(true);
+		orderService.refillContainer(containerName, refillQuantity);
+	}
+	
+	@Test
+	public void refillContainer_when_RefillQuantityIsLessThanOrEqualToMaximumRefillQuantity_shouldReturnTrue() {
+		String containerName = "tea";
+		int refillQuantity = 20;
+		Container teaContainer = new Container("tea", 100, false, 80);
+		when(containerDAO.getContainerByName("tea")).thenReturn(teaContainer);
+		when(containerDAO.updateContainer(any(Container.class))).thenReturn(true);
+		assertTrue(orderService.refillContainer(containerName, refillQuantity));
+	}
+	
+	@Test
+	public void refillContainer_when_RefillQuantityIsLessThanOrEqualToMaximumRefillQuantity_shouldReturnFalse() {
+		String containerName = "tea";
+		int refillQuantity = 20;
+		Container teaContainer = new Container("tea", 100, false, 80);
+		when(containerDAO.getContainerByName("tea")).thenReturn(teaContainer);
+		when(containerDAO.updateContainer(any(Container.class))).thenReturn(false);
+		assertFalse(orderService.refillContainer(containerName, refillQuantity));
+	}
+
 	
 
 }

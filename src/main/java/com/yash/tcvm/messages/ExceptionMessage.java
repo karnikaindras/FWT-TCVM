@@ -29,9 +29,14 @@ public interface ExceptionMessage {
 	String WHEN_LIST_OF_MATERIALS_REQUIRED_IS_EMPTY = "List of materials required cannot be empty";
 
 	String WHEN_ORDER_QUANTITY_IS_LESS_THAN_ZERO = "Order quantity cannot be negative";
-
 	
+	String WHEN_REFILL_QUANTITY_IS_NEGATIVE = "Refill Quantity cannot be negative";
 
-	
+	String WHEN_MAXIMUM_REFILL_QUANTITY_OF_CONTAINER_IS_ZERO = "Container is full already. Refill Not allowed";
+
+	String WHEN_CONTAINER_REFILL_QUANTITY_IS_MORE_THAN_CAPACITY_OF_CONATINER = "Refill will cause container overFlow";
+
+	String WHEN_NO_CONTAINER_EXIST_WTIH_GIVEN_NAME = "No such container exists";
+
 	
 }

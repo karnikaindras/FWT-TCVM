@@ -5,7 +5,10 @@ package com.yash.tcvm.serviceimpl;
 import java.util.List;
 
 import com.yash.tcvm.dao.ContainerDAO;
+import com.yash.tcvm.dao.OrderDAO;
 import com.yash.tcvm.daoimpl.ContainerDAOImpl;
+import com.yash.tcvm.daoimpl.OrderDAOImpl;
+import com.yash.tcvm.exception.ContainerOverflowException;
 import com.yash.tcvm.exception.InvalidInputException;
 import com.yash.tcvm.exception.NotEnoughMaterialPresentException;
 import com.yash.tcvm.exception.NullValueNotAllowedException;
@@ -14,22 +17,29 @@ import com.yash.tcvm.factoryimpl.BeverageFactoryImpl;
 import com.yash.tcvm.messages.ExceptionMessage;
 import com.yash.tcvm.model.Beverage;
 import com.yash.tcvm.model.Container;
+import com.yash.tcvm.model.DrinkWiseReport;
 import com.yash.tcvm.model.MaterialUsage;
 import com.yash.tcvm.model.Order;
 import com.yash.tcvm.model.OrderType;
+import com.yash.tcvm.model.TotalSalesReport;
 import com.yash.tcvm.service.ContainerService;
 import com.yash.tcvm.service.OrderService;
+import com.yash.tcvm.service.ReportService;
 
 public class OrderServiceImpl implements OrderService {
 	
 	private ContainerDAO containerDAO;
 	private BeverageFactory beverageFactory;
 	private ContainerService containerService;
+	private ReportService reportService;
+	private OrderDAO orderDAO;
 	
 	public OrderServiceImpl() {
 		containerDAO = new ContainerDAOImpl();
 		beverageFactory = new BeverageFactoryImpl();
 		containerService = new ContainerServiceImpl(containerDAO);
+		orderDAO = new OrderDAOImpl();
+		reportService = new ReportServiceImpl(orderDAO);
 	}
 	public OrderServiceImpl(ContainerDAO containerDAO, BeverageFactory beverageFactory, ContainerService containerService ) {
 		this.containerDAO = containerDAO;
@@ -76,6 +86,7 @@ public class OrderServiceImpl implements OrderService {
 
 	private boolean approveOrder(List<MaterialUsage> materialUsedForGivenBeverageQty) {
 		boolean isOrderApproved = true;
+		
 		for (MaterialUsage materialUsage : materialUsedForGivenBeverageQty) {
 			String materialName = materialUsage.getMaterialName();
 			Container container = containerDAO.getContainerByName(materialName);
@@ -96,6 +107,8 @@ public class OrderServiceImpl implements OrderService {
 		int quantity = order.getItemQty();
 		Beverage orderedBeverage = beverageFactory.createBeverage(beverageName);
 		totalBillAmount = orderedBeverage.getPrice() * quantity;
+		order.setTotalAmount(totalBillAmount);
+		orderDAO.addOrder(order);
 		return totalBillAmount;
 	}
 
@@ -112,9 +125,89 @@ public class OrderServiceImpl implements OrderService {
 		List<MaterialUsage> materialUsedForGivenBeverageQty = calculateMaterialRequiredForGivenQty(orderedBeverage, quantity,materialUsedForMakingOneBeverage );
 		return containerService.prepareBeverage(materialUsedForGivenBeverageQty);
 	}
+	
 	@Override
 	public List<Container> getContainerStatus() {
 		return containerDAO.listContainers();
 	}
+	
+	@Override
+	public boolean refillContainer(String containerName, int refillQuantity) {
+		
+		if(containerName == null) {
+			throw new NullValueNotAllowedException(ExceptionMessage.WHEN_CONTAINER_NAME_IS_NULL);
+		}
+		if(refillQuantity <0) {
+			throw new InvalidInputException(ExceptionMessage.WHEN_REFILL_QUANTITY_IS_NEGATIVE);
+		}
+		
+		Container toBeRefilledContainer = containerDAO.getContainerByName(containerName);
+		int maximumRefillQuantity = calculateMaximumRefillQuantity(toBeRefilledContainer);
+		
+		if( maximumRefillQuantity == 0) {
+			throw new ContainerOverflowException(ExceptionMessage.WHEN_MAXIMUM_REFILL_QUANTITY_OF_CONTAINER_IS_ZERO);
+		}
+		
+		if(refillQuantity > maximumRefillQuantity) {
+			throw new ContainerOverflowException(ExceptionMessage.WHEN_CONTAINER_REFILL_QUANTITY_IS_MORE_THAN_CAPACITY_OF_CONATINER);
+		}
+		
+		int volumeFilledAfterRefill = toBeRefilledContainer.getVolumeFilled() + refillQuantity;
+		toBeRefilledContainer.setVolumeFilled(volumeFilledAfterRefill);
+		boolean isRefilled = containerDAO.updateContainer(toBeRefilledContainer);
+		return isRefilled;
+	}
+	
+	public boolean refillContainer(Order order) {
+		String containerName = order.getIngredientName();
+		int refillQuantity = order.getItemQty();
+		if(containerName == null) {
+			throw new NullValueNotAllowedException(ExceptionMessage.WHEN_CONTAINER_NAME_IS_NULL);
+		}
+		if(refillQuantity <0) {
+			throw new InvalidInputException(ExceptionMessage.WHEN_REFILL_QUANTITY_IS_NEGATIVE);
+		}
+		
+		Container toBeRefilledContainer = containerDAO.getContainerByName(containerName);
+		int maximumRefillQuantity = calculateMaximumRefillQuantity(toBeRefilledContainer);
+		
+		if( maximumRefillQuantity == 0) {
+			throw new ContainerOverflowException(ExceptionMessage.WHEN_MAXIMUM_REFILL_QUANTITY_OF_CONTAINER_IS_ZERO);
+		}
+		
+		if(refillQuantity > maximumRefillQuantity) {
+			throw new ContainerOverflowException(ExceptionMessage.WHEN_CONTAINER_REFILL_QUANTITY_IS_MORE_THAN_CAPACITY_OF_CONATINER);
+		}
+		
+		int volumeFilledAfterRefill = toBeRefilledContainer.getVolumeFilled() + refillQuantity;
+		toBeRefilledContainer.setVolumeFilled(volumeFilledAfterRefill);
+		boolean isRefilled = containerDAO.updateContainer(toBeRefilledContainer);
+		if(isRefilled) {
+			orderDAO.addOrder(order);
+		}
+		return isRefilled;
+	}
+	
+	private int calculateMaximumRefillQuantity(Container toBeRefilledContainer) {
+		
+		int maximumRefillQuantity = toBeRefilledContainer.getMaxCapacity() - toBeRefilledContainer.getVolumeFilled();
+		return maximumRefillQuantity;
+	}
+	
+	@Override
+	public TotalSalesReport generateTotalSaleReport() {
+		
+		return reportService.generateTotalSalesReport();
+	}
+	@Override
+	public List<DrinkWiseReport> generateDrinkWiseSaleReport() {
+		return reportService.generateDrinkWiseReport();
+	}
+	@Override
+	public int generateRefillCount() {
+		return reportService.generateRefillCount();
+	}
+	
+	
 
 }
