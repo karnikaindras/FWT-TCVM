@@ -14,6 +14,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 
 import com.yash.tcvm.dao.ContainerDAO;
+import com.yash.tcvm.dao.OrderDAO;
 import com.yash.tcvm.exception.ContainerOverflowException;
 import com.yash.tcvm.exception.InvalidInputException;
 import com.yash.tcvm.exception.NotEnoughMaterialPresentException;
@@ -39,13 +40,15 @@ public class OrderServiceImplTest {
 	private ContainerDAO containerDAO;
 	private ContainerService containerService;
 	private BeverageFactory beverageFactory;
+	private OrderDAO orderDAO;
 	
 	@Before
 	public void setUp() {
 		containerDAO = mock(ContainerDAO.class);
+		orderDAO = mock(OrderDAO.class);
 		beverageFactory = mock(BeverageFactory.class);
 		containerService = mock(ContainerService.class);
-		orderService = new OrderServiceImpl(containerDAO, beverageFactory, containerService);
+		orderService = new OrderServiceImpl(containerDAO, beverageFactory, containerService, orderDAO);
 		
 		List<MaterialUsage> materialUsageForBeverage = new ArrayList<MaterialUsage>();
 		MaterialUsage tea = new MaterialUsage("tea", 3, "gm", 0);
@@ -107,13 +110,6 @@ public class OrderServiceImplTest {
 		orderService.takeOrder(order);
 	}
 	
-	@Test
-	public void generateBill_shouldReturnTotalBillAmount_Equal_To_10() {
-		Order order = new Order(1, OrderType.ORDER, "blacktea",0,2);
-		when(beverageFactory.createBeverage("blacktea")).thenReturn(blacktea);
-		int totalAmount = orderService.generateBill(order);
-		assertEquals(10, totalAmount);
-	}
 	
 	@Test(expected = NullValueNotAllowedException.class)
 	public void generateBill_WhenOrderObjectPassedIs_NULL_ShouldThrowException() {
@@ -138,56 +134,60 @@ public class OrderServiceImplTest {
 	
 	@Test(expected = NullValueNotAllowedException.class)
 	public void refillContainer_when_containerNamePassedIsNull_shouldThrowException() {
-		String containerName = null;
-		int refillQuantity = 200;
-		orderService.refillContainer(containerName, refillQuantity);
+		Order order = new Order(1, OrderType.REFILL,null,0,100);
+		orderService.refillContainer(order);
 	}
+
 	
 	@Test(expected = InvalidInputException.class)
 	public void refillContainer_when_refillQuantityPassedIsNegative_shouldThrowException() {
-		String containerName = "tea";
-		int refillQuantity = -200;
-		orderService.refillContainer(containerName, refillQuantity);
+		Order order = new Order();
+		order.setIngredientName("tea");
+		order.setItemQty(-200);
+		orderService.refillContainer(order);
+
 	}
-	
+
 	@Test(expected = ContainerOverflowException.class)
 	public void refillContainer_when_ContainerIsCompletelyFilledAlready_shouldThrowException() {
-		String containerName = "tea";
-		int refillQuantity = 20;
+		Order order = new Order();
+		order.setIngredientName("tea");
+		order.setItemQty(20);
 		Container teaContainer = new Container("tea", 100, false, 100);
 		when(containerDAO.getContainerByName("tea")).thenReturn(teaContainer);
-//		when(containerDAO.updateContainer(any(Container.class))).thenReturn(true);
-		orderService.refillContainer(containerName, refillQuantity);
+		orderService.refillContainer(order);
 	}
 	
 	@Test(expected = ContainerOverflowException.class)
 	public void refillContainer_when_RefillQuantityIsGreaterThanMaximumRefillQuantity_shouldThrowException() {
-		String containerName = "tea";
-		int refillQuantity = 30;
+		Order order = new Order();
+		order.setIngredientName("tea");
+		order.setItemQty(30);
 		Container teaContainer = new Container("tea", 100, false, 80);
 		when(containerDAO.getContainerByName("tea")).thenReturn(teaContainer);
-//		when(containerDAO.updateContainer(any(Container.class))).thenReturn(true);
-		orderService.refillContainer(containerName, refillQuantity);
+		orderService.refillContainer(order);
 	}
 	
 	@Test
 	public void refillContainer_when_RefillQuantityIsLessThanOrEqualToMaximumRefillQuantity_shouldReturnTrue() {
-		String containerName = "tea";
-		int refillQuantity = 20;
+		Order order = new Order();
+		order.setIngredientName("tea");
+		order.setItemQty(20);
 		Container teaContainer = new Container("tea", 100, false, 80);
 		when(containerDAO.getContainerByName("tea")).thenReturn(teaContainer);
 		when(containerDAO.updateContainer(any(Container.class))).thenReturn(true);
-		assertTrue(orderService.refillContainer(containerName, refillQuantity));
+		assertTrue(orderService.refillContainer(order));
 	}
 	
 	@Test
 	public void refillContainer_when_RefillQuantityIsLessThanOrEqualToMaximumRefillQuantity_shouldReturnFalse() {
-		String containerName = "tea";
-		int refillQuantity = 20;
+		Order order = new Order();
+		order.setIngredientName("tea");
+		order.setItemQty(20);
 		Container teaContainer = new Container("tea", 100, false, 80);
 		when(containerDAO.getContainerByName("tea")).thenReturn(teaContainer);
 		when(containerDAO.updateContainer(any(Container.class))).thenReturn(false);
-		assertFalse(orderService.refillContainer(containerName, refillQuantity));
+		assertFalse(orderService.refillContainer(order));
 	}
 
 	

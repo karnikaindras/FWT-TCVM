@@ -18,8 +18,6 @@ public interface OrderService {
 
 	List<Container> getContainerStatus();
 	
-	boolean refillContainer(String containerName, int refillQuantity);
-	
 	public boolean refillContainer(Order order);
 
 	TotalSalesReport generateTotalSaleReport();
@@ -27,5 +25,6 @@ public interface OrderService {
 	List<DrinkWiseReport> generateDrinkWiseSaleReport();
 
 	int generateRefillCount();
+
 
 }

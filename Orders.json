@@ -1,1 +1,1 @@
-[{"orderId":2,"orderType":"ORDER","beverageName":"coffee","itemQty":2,"totalAmount":0},{"orderId":3,"orderType":"ORDER","beverageName":"tea","itemQty":2,"totalAmount":0}]
+[{"orderId":0,"orderType":"ORDER","beverageName":"coffee","itemQty":1,"totalAmount":15},{"orderId":0,"orderType":"ORDER","beverageName":"coffee","itemQty":1,"totalAmount":15},{"orderId":0,"orderType":"REFILL","itemQty":150,"ingredientName":"milk","totalAmount":0}]

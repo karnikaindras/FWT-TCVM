@@ -41,10 +41,11 @@ public class OrderServiceImpl implements OrderService {
 		orderDAO = new OrderDAOImpl();
 		reportService = new ReportServiceImpl(orderDAO);
 	}
-	public OrderServiceImpl(ContainerDAO containerDAO, BeverageFactory beverageFactory, ContainerService containerService ) {
+	public OrderServiceImpl(ContainerDAO containerDAO, BeverageFactory beverageFactory, ContainerService containerService, OrderDAO orderDAO ) {
 		this.containerDAO = containerDAO;
 		this.beverageFactory = beverageFactory;
 		this.containerService = containerService;
+		this.orderDAO = orderDAO;
 	}
 
 	
@@ -131,33 +132,7 @@ public class OrderServiceImpl implements OrderService {
 		return containerDAO.listContainers();
 	}
 	
-	@Override
-	public boolean refillContainer(String containerName, int refillQuantity) {
-		
-		if(containerName == null) {
-			throw new NullValueNotAllowedException(ExceptionMessage.WHEN_CONTAINER_NAME_IS_NULL);
-		}
-		if(refillQuantity <0) {
-			throw new InvalidInputException(ExceptionMessage.WHEN_REFILL_QUANTITY_IS_NEGATIVE);
-		}
-		
-		Container toBeRefilledContainer = containerDAO.getContainerByName(containerName);
-		int maximumRefillQuantity = calculateMaximumRefillQuantity(toBeRefilledContainer);
-		
-		if( maximumRefillQuantity == 0) {
-			throw new ContainerOverflowException(ExceptionMessage.WHEN_MAXIMUM_REFILL_QUANTITY_OF_CONTAINER_IS_ZERO);
-		}
-		
-		if(refillQuantity > maximumRefillQuantity) {
-			throw new ContainerOverflowException(ExceptionMessage.WHEN_CONTAINER_REFILL_QUANTITY_IS_MORE_THAN_CAPACITY_OF_CONATINER);
-		}
-		
-		int volumeFilledAfterRefill = toBeRefilledContainer.getVolumeFilled() + refillQuantity;
-		toBeRefilledContainer.setVolumeFilled(volumeFilledAfterRefill);
-		boolean isRefilled = containerDAO.updateContainer(toBeRefilledContainer);
-		return isRefilled;
-	}
-	
+
 	public boolean refillContainer(Order order) {
 		String containerName = order.getIngredientName();
 		int refillQuantity = order.getItemQty();
@@ -187,6 +162,7 @@ public class OrderServiceImpl implements OrderService {
 		}
 		return isRefilled;
 	}
+	
 	
 	private int calculateMaximumRefillQuantity(Container toBeRefilledContainer) {
 		
