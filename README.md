@@ -22,9 +22,6 @@ should also have flexible reporting features.
  Container Status
  Exit TCVM
 
-### Use Case
-![tcvm use case](httpsgithub.comharmeet-salujatcvmblobmasterimagestcvmusecase.png)
-
 ### Running The Application
 1. Download the zip by clicking on Clone or Download  Download as Zip.
 2. Extract the downloaded zip file.
